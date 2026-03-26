@@ -153,9 +153,9 @@ let patient = {
   injuryNote: null
 };
 
-// QR Code pointing to website URL
+// QR Code pointing to live GitHub Pages URL
 function generateQRCode() {
-  const websiteURL = "https://your-hosted-website.com/quick-aid.html"; // <-- Replace with your hosted page URL
+  const websiteURL = "https://mansibavaliya.github.io/quick-aid-emergency-qr-system/";
   QRCode.toCanvas(document.getElementById('qrCode'), websiteURL, { width: 140 }, function(err) {
     if(err) console.error(err);
   });
@@ -228,12 +228,32 @@ function capturePhoto() {
 
     patient.photo = image;
     patient.injuryNote = document.getElementById("injuryNote").value;
-    localStorage.setItem("injury", JSON.stringify({image, note: patient.injuryNote, timestamp: new Date().toLocaleString()}));
+
+    // Save photo + note with timestamp to localStorage
+    const record = {
+      image,
+      note: patient.injuryNote,
+      timestamp: new Date().toLocaleString()
+    };
+    localStorage.setItem("injuryRecord", JSON.stringify(record));
 
     generateQRCode();
     document.getElementById("downloadBtn").classList.remove("hidden");
-  } else { alert("Please start the camera first!"); }
+  } else { 
+    alert("Please start the camera first!"); 
+  }
 }
+
+// Load saved photo + note on page load
+function loadSavedInjury() {
+  const saved = JSON.parse(localStorage.getItem("injuryRecord"));
+  if(saved){
+    document.getElementById("photo").src = saved.image;
+    document.getElementById("injuryNote").value = saved.note;
+    document.getElementById("downloadBtn").classList.remove("hidden");
+  }
+}
+window.onload = loadSavedInjury;
 
 // Download photo + note
 function downloadInjury() {
